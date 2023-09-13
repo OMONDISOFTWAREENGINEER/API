@@ -4,62 +4,77 @@
   <title>Math Quiz</title>
   <style>
     body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
 
-.container {
-  margin-top: 50px;
-}
+    .container {
+      margin-top: 50px;
+    }
 
-button {
-  margin-top: 20px;
-}
+    button {
+      margin-top: 20px;
+    }
 
-#result {
-  margin-top: 20px;
-}
-    </style>
+    #result {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Math Quiz</h1>
+  <div id="question-container">
+    <h2>Question:</h2>
     <p id="question"></p>
-    <input type="number" id="answer" placeholder="Your Answer">
-    <button id="submit">Submit</button>
+  </div>
+  
+  <div id="answer-container">
+    <h2>Answers:</h2>
+    <div id="answer"></div>
+  </div>
+  <div id="result-container">
+    <h2>Result:</h2>
     <p id="result"></p>
   </div>
 
   <script>
     const questionElement = document.getElementById("question");
-const answerElement = document.getElementById("answer");
-const submitButton = document.getElementById("submit");
-const resultElement = document.getElementById("result");
+    const answerElement = document.getElementById("answer");
+    const submitButton = document.getElementById("submit");
+    const resultElement = document.getElementById("result");
 
-function fetchQuestion() {
-  // Make an API request to get a math question
-  fetch("https://the-trivia-api.com/v2/questions")
-    .then(response => response.json())
-    .then(data => {
-      questionElement.textContent = data['question'];
-    });
-}
+    function fetchQuestion() {
+      // Make an API request to get a math question
+      fetch("https://the-trivia-api.com/v2/questions")
+        .then(response => response.json())
+        .then(data => {
+          const questionData = data[0]; // Assuming you want the first question
+          questionElement.textContent = questionData.question.text;
 
-function checkAnswer() {
-  const answer = answerElement.value;
-  
-  // Make an API request to check the answer
-  fetch(`https://the-trivia-api.com/v2/questions/${answer}`)
-    .then(response => response.json())
-    .then(data => {
-      resultElement.textContent = data['correct'] ? "Correct!" : "Incorrect!";
-    });
-}
+          // Create answer buttons
+          const answerButtons = questionData.incorrectAnswers.concat(questionData.correctAnswer);
+          answerButtons.sort(() => Math.random() - 0.5); // Shuffle the answers
 
-// Fetch the first question when the page loads
-fetchQuestion();
+          answerButtons.forEach(answer => {
+            const button = document.createElement('button');
+            button.textContent = answer;
+            button.addEventListener('click', () => checkAnswer(answer, questionData.correctAnswer));
+            answerElement.appendChild(button);
+          });
+        });
+    }
 
-submitButton.addEventListener("click", checkAnswer);
+    function checkAnswer(selectedAnswer, correctAnswer) {
+      if (selectedAnswer === correctAnswer) {
+        resultElement.textContent = "Correct!";
+      } else {
+        resultElement.textContent = "Incorrect!";
+      }
+    }
+
+    // Fetch the first question when the page loads
+    fetchQuestion();
+
+    submitButton.addEventListener("click", checkAnswer);
   </script>
 </body>
 </html>
