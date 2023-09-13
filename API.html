@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Math Quiz</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.container {
+  margin-top: 50px;
+}
+
+button {
+  margin-top: 20px;
+}
+
+#result {
+  margin-top: 20px;
+}
+    </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Math Quiz</h1>
+    <p id="question"></p>
+    <input type="number" id="answer" placeholder="Your Answer">
+    <button id="submit">Submit</button>
+    <p id="result"></p>
+  </div>
+
+  <script>
+    const questionElement = document.getElementById("question");
+const answerElement = document.getElementById("answer");
+const submitButton = document.getElementById("submit");
+const resultElement = document.getElementById("result");
+
+function fetchQuestion() {
+  // Make an API request to get a math question
+  fetch("https://the-trivia-api.com/v2/questions")
+    .then(response => response.json())
+    .then(data => {
+      questionElement.textContent = data['question'];
+    });
+}
+
+function checkAnswer() {
+  const answer = answerElement.value;
+  
+  // Make an API request to check the answer
+  fetch(`https://the-trivia-api.com/v2/questions/${answer}`)
+    .then(response => response.json())
+    .then(data => {
+      resultElement.textContent = data['correct'] ? "Correct!" : "Incorrect!";
+    });
+}
+
+// Fetch the first question when the page loads
+fetchQuestion();
+
+submitButton.addEventListener("click", checkAnswer);
+  </script>
+</body>
+</html>
